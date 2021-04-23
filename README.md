@@ -29,7 +29,7 @@ getGlobal获取全局变量的值  getGlobal(key)
 ###### react使用示例:
 
 ```
-import {bindData, setGlobal} from 'react-gsm';
+import {bindData, setGlobal} from 'rv-gsm';
 export default class Test extends React.Component {  
     constructor(props) {  
         super(props);
