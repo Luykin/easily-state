@@ -1,5 +1,9 @@
 ## 🚀rv-gsm是一个轻量级的react/vue全局状态管理库
 
+
+
+###### vue 使用示例仓库代码: https://github.com/Luykin/vue3-test
+
 - 简化initGlobal调用，initGlobal第一个参数initial为全局变量，变量名称以__来头的意味需要本地化存储,第二参数为网站版本号，尽量遵循在网站大更新需要清除本地缓存时更换此参数
 - 对本地存储进行加密
 
