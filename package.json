@@ -1,6 +1,6 @@
 {
   "name": "rv-gsm",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Lightweight react/vue global state management(轻量级react/vue全局状态管理)",
   "main": "global.js",
   "scripts": {
