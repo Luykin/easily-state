@@ -1,6 +1,6 @@
 {
   "name": "rv-gsm",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Lightweight react/vue global state management(轻量级react/vue全局状态管理)",
   "main": "global.js",
   "scripts": {
@@ -21,5 +21,8 @@
     "url": "https://github.com/Luykin/rv-gsm"
   },
   "author": "luoyukun",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "crypto-js": "^4.0.0"
+  }
 }
