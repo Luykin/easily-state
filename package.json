@@ -23,6 +23,7 @@
   "author": "luoyukun",
   "license": "ISC",
   "dependencies": {
-    "crypto-js": "^4.0.0"
+    "crypto-js": "^4.0.0",
+    "ramda": "^0.27.1"
   }
 }
