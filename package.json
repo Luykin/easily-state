@@ -1,8 +1,8 @@
 {
-  "name": "rv-gsm",
+  "name": "easy-state",
   "version": "1.0.6",
   "description": "Lightweight react/vue global state management(轻量级react/vue全局状态管理)",
-  "main": "global.js",
+  "main": "easy-state.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
