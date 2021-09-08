@@ -11,7 +11,7 @@ import * as CryptoJS from "crypto-js";
  */
 let DFT_VERSION: string = "@VERSION_BATE@";
 let LSV_KEY: string = "@WEB_VERSION_EASY_STATE@";
-let LOCAL_CACHE, GLOBAL: object = {};
+let LOCAL_CACHE: object = {}, GLOBAL: object = {};
 let IS_CONSOLE: boolean = false;
 let WEB_VERSION: string = R.defaultTo(DFT_VERSION, localStorage.getItem(LSV_KEY));
 
@@ -23,17 +23,20 @@ export function init(group: Array<object> | object, config?: { version: string, 
   try {
     IS_CONSOLE = Boolean(config?.console);
     _checkVS(config?.version);
-    const UDG = R.ifElse(() => R.type(group) === "Array", R.mergeAll, R.always)(group); // un formatted default global data 未格式化初始数据
-    console.log(UDG, "UDG");
+    const UDG = R.type(group) === "Array" ? R.mergeAll(group) : group; // un formatted default global data 未格式化初始数据
+    console.log(UDG, "UDG", IS_CONSOLE);
     const isCacheKey = (val, key) => key.includes(WEB_VERSION);
-    const noCacheDG = R.pickBy(!isCacheKey);
+    const notCacheKey = (val, key) => !key.includes(WEB_VERSION);
+    const noCacheDG = R.pickBy(notCacheKey);
     const changeKey = array => {
       const key = array[0].replace(WEB_VERSION, "");
-      return [key, R.default(array[1], getLSValue(key))];
+      return [key, R.defaultTo(array[1], getLSValue(key))];
     };
-    const getLSValue = key => CryptoJS.AES.decrypt(localStorage.getItem(`${WEB_VERSION}${key}`), WEB_VERSION, {}).toString(CryptoJS.enc.Utf8);
+    const getLSValue = key => {
+      const str = localStorage.getItem(`${WEB_VERSION}${key}`);
+      return str ? CryptoJS.AES.decrypt(str, WEB_VERSION, {}).toString(CryptoJS.enc.Utf8) : str;
+    };
     const cacheDG = R.pipe(R.pickBy(isCacheKey), R.toPairs, R.map(changeKey), R.fromPairs);
-    console.log(noCacheDG(UDG), cacheDG(UDG), "cacheDG(UDG)");
     R.isEmpty(GLOBAL) && (GLOBAL = R.mergeAll([noCacheDG(UDG), cacheDG(UDG)]));
   } catch (err) {
     _consoleLog(JSON.stringify(err));
@@ -49,8 +52,12 @@ function _proxy(key: string) {
     let val = GLOBAL[key];
     Object.defineProperty(GLOBAL, key, {
       set: function(newVal) {  //通知各个订阅者，支持[react class / hook] [vue2 / 3]
-        const noticeAll = R.pipe(LOCAL_CACHE[key].forEach((noticeFnc) => noticeFnc(key, newVal)), () => (this[key] = newVal));
-        R.ifElse(R.equals(val), R.identity, noticeAll)(newVal);
+        if (newVal !== val && LOCAL_CACHE[key]) {
+          console.log(LOCAL_CACHE[key], "xx");
+          LOCAL_CACHE[key].forEach((noticeFnc) => noticeFnc(key, newVal));
+          val = newVal;
+          this[key] = newVal;
+        }
       }
     });
   } catch (err) {
@@ -60,11 +67,14 @@ function _proxy(key: string) {
 
 export function bindData(key: string, local: any) {
   try {
+    console.log("????");
     _clearDestroyLocal(key);//清空已经被销毁的订阅者
     const noticeFnc = _buildNotice(local); //先处理好noticeFnc
-    R.ifElse(R.isEmpty(LOCAL_CACHE?.key), () => LOCAL_CACHE[key] = [noticeFnc], () => LOCAL_CACHE[key].push(noticeFnc))();
-    _proxy(local);
+    R.ifElse(() => !(LOCAL_CACHE[key]), () => LOCAL_CACHE[key] = [noticeFnc], () => LOCAL_CACHE[key].push(noticeFnc))();
+    _proxy(key);
     _wrapDestroy(local);
+    console.log(R.type(local) === "Array" && local?.length === 2, "a");
+    return R.ifElse(() => R.type(local) === "Array" && local?.length === 2, () => [GLOBAL[key] || local[0], local[1]], () => GLOBAL[key])();
   } catch (err) {
     _consoleLog(JSON.stringify(err));
     return null;
@@ -74,8 +84,10 @@ export function bindData(key: string, local: any) {
 export function setGlobal(key: string, value: any, callback?) {
   try {
     GLOBAL[key] = value;
+    console.log(key, GLOBAL);
     callback && callback();
   } catch (err) {
+    console.log(err);
     _consoleLog(JSON.stringify(err));
   }
 }
@@ -92,7 +104,7 @@ export function setGlobalStorage(key: string, value: any, otherKey?: string) {
 function _clearDestroyLocal(key: string) {
   try {
     const isNotDestroy = l => !l[LSV_KEY]; //判定没有被销毁的订阅者 !false;
-    R.ifElse(R.isEmpty(LOCAL_CACHE[key]), R.identity, () => (LOCAL_CACHE[key] = R.filter(isNotDestroy, LOCAL_CACHE[key])))();
+    R.ifElse(R.isEmpty(LOCAL_CACHE[key]), R.identity, () => (LOCAL_CACHE[key] = R.filter(isNotDestroy, LOCAL_CACHE[key])))(key);
   } catch (err) {
     _consoleLog(JSON.stringify(err));
   }
@@ -121,10 +133,12 @@ function _buildNotice(local: any) {
   const isDestroy = local[LSV_KEY];
   if (R.type(local) === "Array") { // react hook
     return (key, newVal) => { //拿不到hook数组就清理local list
-      R.ifElse(!isDestroy && local?.length, () => local[1](newVal), () => local[LSV_KEY] = true)();
+      console.log("执行 Array");
+      R.ifElse(R.always(!isDestroy && local?.length), local[1], () => local[LSV_KEY] = true)(newVal);
     };
   }
   if (R.type(local?.setState) === "Function") { // react class
+    console.log("执行 Function");
     return (key, newVal) => !isDestroy && local["setState"]({[key]: newVal});
   }
   return (key, newVal) => !isDestroy && local && (local[key] = newVal); //vue 2/3
