@@ -1,29 +1,22 @@
-## 🚀rv-gsm是一个轻量级的react/vue全局状态管理库
+## 🚀easily-state 是一个轻量级的react / vue 全局状态管理库
 
 
 
-###### vue 使用示例仓库代码: https://github.com/Luykin/vue3-test
-
-- 简化initGlobal调用，initGlobal第一个参数initial为全局变量，变量名称以__来头的意味需要本地化存储,第二参数为网站版本号，尽量遵循在网站大更新需要清除本地缓存时更换此参数
-- 对本地存储进行加密
+- easily-state 是对rv-gsm库的升级 (支持react hook / vue3)
+- 支持快速读取localStorage,支持加密持久化进localStorage
+- 当前对外的方法: init bindData setGlobal getGlobal setGlobalStorage cache
+- TODO: 未来支持: 数据过程监控 
 
 ##### **⭐️安装**
 
-`yarn add rv-gsm`
+`yarn add easily-state`
 
-##### **⭐️初始化**
+##### **⭐使用**
 
-请尽可能提前初始化,rv-gsm会在浏览器localStorage中主动取出键值对存储全局变量中
+- init(group: Array<object> | object, config: object) callback
+- ...教程完善中,如有需求联系微信： destired
 
-```
-import {initGlobal} from 'rv-gsm';
-
-const defaultGlobal = {  __userInfo: null,  __token: null, other: '...' };
-
-initGlobal(defaultGlobal);
-```
-
-##### **⭐️简单使用**
+##### **⭐️简单示例**
 
 bindData会监听全局变量的改变,从而改变每一个页面state中的值,第二参数传入this   bindData(key, local)
 
