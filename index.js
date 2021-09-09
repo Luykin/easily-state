@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.cache = exports.setGlobalStorage = exports.getGlobal = exports.setGlobal = exports.bindData = exports.init = void 0;
 var R = require("ramda");
 var CryptoJS = require("crypto-js");

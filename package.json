@@ -1,8 +1,8 @@
 {
-  "name": "easy-state",
+  "name": "easily-state",
   "version": "1.0.7",
   "description": "Lightweight react/vue global state management(轻量级react/vue全局状态管理)",
-  "main": "easy-state.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
