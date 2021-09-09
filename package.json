@@ -1,6 +1,6 @@
 {
   "name": "easy-state",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Lightweight react/vue global state management(轻量级react/vue全局状态管理)",
   "main": "easy-state.js",
   "scripts": {
