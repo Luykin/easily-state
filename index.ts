@@ -34,10 +34,11 @@ export function init(group: Array<object> | object, config?: { version: string, 
     };
     const getLSValue = key => {
       const str = localStorage.getItem(`${WEB_VERSION}${key}`);
-      return str ? CryptoJS.AES.decrypt(str, WEB_VERSION, {}).toString(CryptoJS.enc.Utf8) : str;
+      return str ? JSON.parse(CryptoJS.AES.decrypt(str, WEB_VERSION, {}).toString(CryptoJS.enc.Utf8)) : str;
     };
     const cacheDG = R.pipe(R.pickBy(isCacheKey), R.toPairs, R.map(changeKey), R.fromPairs);
     R.isEmpty(GLOBAL) && (GLOBAL = R.mergeAll([noCacheDG(UDG), cacheDG(UDG)]));
+    console.log(GLOBAL, "GLOBAL");
     _proxyGlobal();//TODO 在这实现总的监听事件
   } catch (err) {
     _consoleLog(JSON.stringify(err));
@@ -90,7 +91,9 @@ export function getGlobal(key: string) {
 
 export function setGlobalStorage(key: string, value: any, otherKey?: string) {
   setGlobal(key, value);
-  localStorage.setItem(otherKey || key, JSON.stringify(value));
+  let str = CryptoJS.enc.Utf8.parse(JSON.stringify(value));
+  let encrypted = CryptoJS.AES.encrypt(str, WEB_VERSION, {});
+  localStorage.setItem(`${WEB_VERSION}${otherKey || key}`, encrypted.toString());
 }
 
 function _clearDestroyLocal(key: string) {
